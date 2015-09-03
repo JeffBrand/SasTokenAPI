@@ -10,6 +10,7 @@ using System.Configuration;
 
 namespace SASTokenAPI.Controllers
 {
+    [Authorize]
     public class SASTokenController : ApiController
     {
         // Hoyo4498
@@ -22,7 +23,7 @@ namespace SASTokenAPI.Controllers
             };
         public SASTokenController()
         {
-            var ttlSetting = ConfigurationManager.AppSettings["TTLMinutes"];
+            var ttlSetting = ConfigurationManager.AppSettings["TokenTTL"];
             int minutes = int.Parse(ttlSetting);
             _ttl = TimeSpan.FromMinutes(minutes);
         }
