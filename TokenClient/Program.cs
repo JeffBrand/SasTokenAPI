@@ -16,66 +16,23 @@ namespace TokenClient
 {
     class Program
     {
-        
-        #region Init
         private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
         private static string tenant = ConfigurationManager.AppSettings["ida:Tenant"];
         private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
         private static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
-        //
-        // To authenticate to the To Do list service, the client needs to know the service's App ID URI.
-        // To contact the To Do list service we need its URL as well.
-        //
+
         private static string sasTokenResourceId = ConfigurationManager.AppSettings["sasToken:resourceId"];
         private static string sasTokenBaseAddress = ConfigurationManager.AppSettings["sasToken:baseAddress"];
         private static AuthenticationContext authContext = null;
-        #endregion
 
         static void Main(string[] args)
         {
             string commandString = string.Empty;
-            //Console.ForegroundColor = ConsoleColor.Blue;
-            //Console.WriteLine("**************************************************");
-            //Console.WriteLine("*              ToDo List Text Client             *");
-            //Console.WriteLine("*                                                *");
-            //Console.WriteLine("*       Type commands to manage your ToDos       *");
-            //Console.WriteLine("*                                                *");
-            //Console.WriteLine("**************************************************");
-            //Console.WriteLine("");
-            // Initialize the AuthenticationContext for the AAD tenant of choice.
-            // Add a persistent file-based token cache.
+
             authContext = new AuthenticationContext(authority, new FileCache());
-
-            // main command cycle
-            //while (!commandString.Equals("Exit", StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    Console.ForegroundColor = ConsoleColor.White;
-            //    Console.WriteLine("Enter command (list | add | clear | exit | help) >");
-            //    commandString = Console.ReadLine();
-
-                //switch (commandString.ToUpper())
-                //{
-                //    case "LIST":
-                        GetToken();
-            //break;
-            //    case "ADD":
-            //        AddTodo();
-            //        break;
-            //    case "CLEAR":
-            //        ClearCache();
-            //        break;
-            //    case "HELP":
-            //        Help();
-            //        break;
-            //    case "EXIT":
-            //        Console.WriteLine("Bye!"); ;
-            //        break;
-            //    default:
-            //        Console.ForegroundColor = ConsoleColor.Red;
-            //        Console.WriteLine("Invalid command.");
-            //        break;
-            //}
-            //}
+           
+            GetToken();
+          
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine();
             Console.WriteLine("Complete");
@@ -106,7 +63,6 @@ namespace TokenClient
             return new UserCredential(user, password);
         }
 
-        // Display exceptions text on the console
         static void ShowError(Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -119,7 +75,6 @@ namespace TokenClient
             Console.WriteLine("Message: {0}", message);
         }
 
-        // Obscure the password being entered
         static string ReadPasswordFromConsole()
         {
             string password = string.Empty;
@@ -144,11 +99,7 @@ namespace TokenClient
             while (key.Key != ConsoleKey.Enter);
             return password;
         }
-        #endregion
 
-        #region Commands
-        // List all the ToDos for the current user.
-        // If there is no valid token available, obtain a new one.
         static void GetToken()
         {
             #region Obtain token
@@ -183,9 +134,7 @@ namespace TokenClient
                     return;
                 }
             }
-            #endregion
 
-            #region Call Web API
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
             HttpResponseMessage response = httpClient.GetAsync(sasTokenBaseAddress + "/api/sastoken?serviceNamespace=jbrandhackathon&keyName=Sender&eventhub=hackhub&publisherId=console").Result;
@@ -198,9 +147,6 @@ namespace TokenClient
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Sas Token: {0}", sasToken);
             }
-            #endregion
-
-            #region Error handling
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -217,11 +163,10 @@ namespace TokenClient
             }
             #endregion
         }
-        // Add a new ToDo in the list of the current user.
-        // If there is no valid token available, obtain a new one.
-        static void AddTodo()
+
+       
+        static void AddSasConfig()
         {
-            #region Obtain token
             AuthenticationResult result = null;
             // first, try to get a token silently            
             try
@@ -253,9 +198,7 @@ namespace TokenClient
                     return;
                 }
             }
-            #endregion
 
-            #region Call Web API
             Console.WriteLine("Enter new todo description >");
             string descr = Console.ReadLine();
 
@@ -270,9 +213,6 @@ namespace TokenClient
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("New ToDo '{0}' successfully added.", descr);
             }
-            #endregion
-
-            #region Error handling
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -289,7 +229,7 @@ namespace TokenClient
             }
             #endregion
         }
-        // Empties the token cache
+
         static void ClearCache()
         {
             authContext.TokenCache.Clear();
@@ -297,7 +237,6 @@ namespace TokenClient
             Console.WriteLine("Token cache cleared.");
         }
       
-        #endregion
     }
 }
 
