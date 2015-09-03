@@ -57,25 +57,29 @@ namespace TokenClient
                 //{
                 //    case "LIST":
                         GetToken();
-                        //break;
-                //    case "ADD":
-                //        AddTodo();
-                //        break;
-                //    case "CLEAR":
-                //        ClearCache();
-                //        break;
-                //    case "HELP":
-                //        Help();
-                //        break;
-                //    case "EXIT":
-                //        Console.WriteLine("Bye!"); ;
-                //        break;
-                //    default:
-                //        Console.ForegroundColor = ConsoleColor.Red;
-                //        Console.WriteLine("Invalid command.");
-                //        break;
-                //}
+            //break;
+            //    case "ADD":
+            //        AddTodo();
+            //        break;
+            //    case "CLEAR":
+            //        ClearCache();
+            //        break;
+            //    case "HELP":
+            //        Help();
+            //        break;
+            //    case "EXIT":
+            //        Console.WriteLine("Bye!"); ;
+            //        break;
+            //    default:
+            //        Console.ForegroundColor = ConsoleColor.Red;
+            //        Console.WriteLine("Invalid command.");
+            //        break;
             //}
+            //}
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine();
+            Console.WriteLine("Complete");
+            Console.ReadKey();  
         }
 
         #region Textual UX
@@ -88,9 +92,15 @@ namespace TokenClient
             Console.WriteLine("Please enter device username and password to sign in.");
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("Device Id [ex: device1@iotdevices.onmicrosoft.com]>");
+            Console.Write("Device Id [default = device1@iotdevices.onmicrosoft.com]> ");
+            Console.ForegroundColor = ConsoleColor.Green;
             string user = Console.ReadLine();
-            Console.Write("Password>");
+
+            if (string.IsNullOrWhiteSpace(user))
+                user = "device1@iotdevices.onmicrosoft.com";
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Password> ");
+            Console.ForegroundColor = ConsoleColor.Green;
             string password = ReadPasswordFromConsole();
             Console.WriteLine("");
             return new UserCredential(user, password);
@@ -182,13 +192,11 @@ namespace TokenClient
 
             if (response.IsSuccessStatusCode)
             {
-                string rezstring = response.Content.ReadAsStringAsync().Result;
-                var todoArray = JArray.Parse(rezstring);
-                Console.ForegroundColor = ConsoleColor.Green;
-                foreach (var todo in todoArray)
-                {
-                    Console.WriteLine(todo["Title"]);
-                }
+                string sasToken = response.Content.ReadAsStringAsync().Result;
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Sas Token: {0}", sasToken);
             }
             #endregion
 
