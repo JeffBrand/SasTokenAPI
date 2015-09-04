@@ -100,7 +100,9 @@ namespace TokenUniversalClient
             // Add the access token to the Authorization Header of the call to the To Do list service, and call the service.
             //
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
-            HttpResponseMessage response = await httpClient.GetAsync(sasTokenBaseAddress + "/api/sasToken?" + queryString);
+
+            var action = string.Format("/api/sastoken/{0}/{1}/{2}?publisherId={3}", serviceNamespace.Text, eventHub.Text, keyName.Text, publisherId.Text);
+            HttpResponseMessage response = await httpClient.GetAsync(sasTokenBaseAddress +  action);
 
             if (response.IsSuccessStatusCode)
             {
