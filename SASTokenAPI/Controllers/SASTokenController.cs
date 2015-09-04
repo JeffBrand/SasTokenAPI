@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
 using System.Web.Routing;
+using System.Security.Claims;
 
 namespace SASTokenAPI.Controllers
 {
@@ -35,7 +36,7 @@ namespace SASTokenAPI.Controllers
         ///  Return list of registered service namespaces
         /// </summary>
         /// <returns></returns>
-        public async Task<IHttpActionResult> GetList()
+        public IHttpActionResult GetList()
         {
             var results = (from m in keys.Keys select m.Split(new char[] { ':' })[0]);
 
@@ -54,7 +55,7 @@ namespace SASTokenAPI.Controllers
         /// <param name="serviceNamespace"></param>
         /// <returns></returns>
         [Route("api/sastoken/{serviceNamespace}")]
-        public async Task<IHttpActionResult> GetListByNamespace(string serviceNamespace)
+        public IHttpActionResult GetListByNamespace(string serviceNamespace)
         {
             var results = (from m in keys.Keys where m.StartsWith(serviceNamespace) select m.Split(new char[] { ':' })[1]);
 
@@ -68,7 +69,7 @@ namespace SASTokenAPI.Controllers
         }
 
         [Route("api/sastoken/{serviceNamespace}/{eventHub}")]
-        public async Task<IHttpActionResult> GetListByEventHubs(string serviceNamespace, string eventHub)
+        public IHttpActionResult GetListByEventHubs(string serviceNamespace, string eventHub)
         {
             var results = (from m in keys.Keys where m.StartsWith(serviceNamespace + ":" + eventHub) select m.Split(new char[] { ':' })[2]);
 
@@ -82,7 +83,7 @@ namespace SASTokenAPI.Controllers
         }
 
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/{keyName}")]
-        public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
+        public IHttpActionResult GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
         {
             var lookup = string.Format("{0}:{1}:{2}", serviceNamespace,eventHub,keyName);
 
