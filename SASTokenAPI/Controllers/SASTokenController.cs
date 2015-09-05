@@ -13,21 +13,22 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Web.Routing;
 using System.Security.Claims;
+using SASTokenAPI.Services;
 
 namespace SASTokenAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class SASTokenController : ApiController
     {
 
         const int DEFAULT_TTL = 120;
 
         TimeSpan _ttl;
-        Dictionary<string, string> keys;
+        IKeyRepository _keyRepo;
 
-        public SASTokenController()
+        public SASTokenController(IKeyRepository keyRepo)
         {
-            LoadKeys();
+            _keyRepo = keyRepo;
             LoadTTL();
            
         }
@@ -36,17 +37,16 @@ namespace SASTokenAPI.Controllers
         ///  Return list of registered service namespaces
         /// </summary>
         /// <returns></returns>
-        public IHttpActionResult GetList()
+        [Route("api/sastoken/servicenamespaces")]
+        public async Task<IHttpActionResult> GetRegisteredNamespaces()
         {
-            var results = (from m in keys.Keys select m.Split(new char[] { ':' })[0]);
+            var keys = await _keyRepo.GetRegistrationsAsync();
+            var namespaces = (from k in keys select k.ServiceNamespace).Distinct();
 
-            if (results != null)
-            {
-
-                return Ok(results.ToArray());
-            }
-
-            return NotFound(); ;
+            if (namespaces != null && namespaces.Count() > 0)
+                return Ok(namespaces);
+            else
+                return NotFound();
         }
 
         /// <summary>
@@ -54,44 +54,40 @@ namespace SASTokenAPI.Controllers
         /// </summary>
         /// <param name="serviceNamespace"></param>
         /// <returns></returns>
-        [Route("api/sastoken/{serviceNamespace}")]
-        public IHttpActionResult GetListByNamespace(string serviceNamespace)
+        [Route("api/sastoken/{serviceNamespace}/eventhubs")]
+        public async Task<IHttpActionResult> GetEventHubsByNamespace(string serviceNamespace)
         {
-            var results = (from m in keys.Keys where m.StartsWith(serviceNamespace) select m.Split(new char[] { ':' })[1]);
-
-            if (results != null)
-            {
-
-                return Ok(results.ToArray());
-            }
-
-            return NotFound(); ;
+            
+            var keys = await _keyRepo.GetRegistrationsAsync();
+            var eventhubs = (from k in keys where k.ServiceNamespace == serviceNamespace select k.EventHub);
+            if (eventhubs != null && eventhubs.Count() > 0)
+                return Ok(eventhubs);
+            else
+                return NotFound();
         }
 
-        [Route("api/sastoken/{serviceNamespace}/{eventHub}")]
-        public IHttpActionResult GetListByEventHubs(string serviceNamespace, string eventHub)
+        [Route("api/sastoken/{serviceNamespace}/{eventHub}/keynames")]
+        public async Task<IHttpActionResult> GetKeyNames(string serviceNamespace, string eventHub)
         {
-            var results = (from m in keys.Keys where m.StartsWith(serviceNamespace + ":" + eventHub) select m.Split(new char[] { ':' })[2]);
+            var keys = await _keyRepo.GetRegistrationsAsync();
+            var names = from k in keys where k.ServiceNamespace == serviceNamespace && k.EventHub == eventHub select k.KeyName;
 
-            if (results != null)
-            {
-
-                return Ok(results.ToArray());
-            }
-
-            return NotFound(); ;
+            if (names != null && names.Count() > 0)
+                return Ok(names);
+            else
+                return NotFound();
         }
 
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/{keyName}")]
-        public IHttpActionResult GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
+        public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
         {
-            var lookup = string.Format("{0}:{1}:{2}", serviceNamespace,eventHub,keyName);
 
-            if (keys.ContainsKey(lookup))
+            if (await _keyRepo.ContainsKeyAsync(serviceNamespace, eventHub, keyName))
             {
                 string serviceUri;
                 string sasToken;
-                
+
+                var key = await _keyRepo.GetKeyAsync(serviceNamespace, eventHub, keyName);
                 switch (transport.ToUpper())
                 {
                     case "HTTP":
@@ -100,13 +96,13 @@ namespace SASTokenAPI.Controllers
                                         .ToString()
                                         .Trim('/');
 
-                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, keys[lookup], serviceUri, _ttl);
+                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName,key, serviceUri, _ttl);
                         return Ok(new SASTokenRespone() { Token = sasToken, TTL = _ttl });
                     case "AMQP":
                         serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", serviceNamespace, String.Format("{0}/publishers/{1}", eventHub, publisherId))
                                        .ToString()
                                        .Trim('/');
-                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, keys[lookup], serviceUri, _ttl);
+                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, key, serviceUri, _ttl);
                         return Ok(new SASTokenRespone { Token = sasToken, TTL = _ttl });
                     default:
                         return BadRequest("Invalid transport type");
@@ -128,43 +124,6 @@ namespace SASTokenAPI.Controllers
             _ttl = TimeSpan.FromMinutes(DEFAULT_TTL);
         }
 
-        private async void LoadKeys()
-        {
-            if (HttpContext.Current.Application["SasKeys"] != null)
-                keys = HttpContext.Current.Application["SasKeys"] as Dictionary<string, string>;
-
-            var filePath = HttpContext.Current.Server.MapPath("~/sas.dat");
-            if (File.Exists(filePath))
-            {
-                var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                var reader = new StreamReader(file);
-                var json = await reader.ReadToEndAsync();
-
-                try
-                {
-                    var keys = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                    HttpContext.Current.Application["SasKeys"] = keys;
-                    
-                }
-                catch (Exception)
-                {
-                    keys = null;
-                }
-            }
-
-            keys =  new Dictionary<string, string>() { { "testServiceNamespace:testEventHub:testSenderKey","test" } };
-           
-        }
-
-        private async Task SaveKeys(Dictionary<string,string> keys)
-        {
-            var json = JsonConvert.SerializeObject(keys);
-            var file = new FileStream(HttpContext.Current.Server.MapPath("~/sas.dat"), FileMode.CreateNew, FileAccess.Write);
-            var writer = new StreamWriter(file);
-            await writer.WriteLineAsync(json);
-            await writer.FlushAsync();
-            file.Close();
-        }
 
         public void Post(string serviceName, string eventHub, string key)
         {

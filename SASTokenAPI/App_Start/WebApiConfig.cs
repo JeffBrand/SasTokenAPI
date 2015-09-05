@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SASTokenAPI.App_Start;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
@@ -10,7 +11,7 @@ namespace SASTokenAPI
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
-
+            config.DependencyResolver = new UnityResolver( UnityConfig.GetConfiguredContainer());
             // Web API routes
             config.MapHttpAttributeRoutes();
 

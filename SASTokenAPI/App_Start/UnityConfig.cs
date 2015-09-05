@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.Configuration;
+using SASTokenAPI.Services;
 
 namespace SASTokenAPI.App_Start
 {
@@ -36,7 +37,7 @@ namespace SASTokenAPI.App_Start
             // container.LoadConfiguration();
 
             // TODO: Register your types here
-            // container.RegisterType<IProductRepository, ProductRepository>();
+            container.RegisterType<IKeyRepository, LocalKeyRepository>();
         }
     }
 }
