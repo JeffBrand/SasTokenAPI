@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TokenUniversalClient.ViewModels;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Popups;
@@ -27,23 +28,26 @@ namespace TokenUniversalClient
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        const string tenant = "iotdevices.onmicrosoft.com"; 
-        const string clientId = "1825ade3-f5a9-482f-a9be-5ac77a4a41d8"; 
-        const string aadInstance = "https://login.microsoftonline.com/{0}";
-        static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
+        //const string tenant = "iotdevices.onmicrosoft.com"; 
+        //const string clientId = "1825ade3-f5a9-482f-a9be-5ac77a4a41d8"; 
+        //const string aadInstance = "https://login.microsoftonline.com/{0}";
+        //static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
 
-        private static string sasTokenResourceId = "https://iotdevices.onmicrosoft.com/sastokenapi";
-        private static string sasTokenBaseAddress = "https://mtcsastokenapi.azurewebsites.net";
+        //private static string sasTokenResourceId = "https://iotdevices.onmicrosoft.com/sastokenapi";
+        //private static string sasTokenBaseAddress = "https://mtcsastokenapi.azurewebsites.net";
 
-        private HttpClient httpClient = new HttpClient();
-        private static AuthenticationContext authContext;
-        private Uri redirectURI;
+        //private HttpClient httpClient = new HttpClient();
+        //private static AuthenticationContext authContext;
+        //private Uri redirectURI;
 
 
         public MainPage()
         {
             this.InitializeComponent();
-
+            this.Loaded += (s,e) =>{
+                var vm = this.DataContext as MainViewModel;
+                vm.Initialize();
+            };
             //
             // Every Windows Store application has a unique URI.
             // Windows ensures that only this application will receive messages sent to this URI.
@@ -54,8 +58,8 @@ namespace TokenUniversalClient
             //      This is the only purposes of this line of code, it has no functional purpose in the application.
             //
 
-            redirectURI = Windows.Security.Authentication.Web.WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
-            authContext = new AuthenticationContext(authority);
+            //redirectURI = Windows.Security.Authentication.Web.WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
+            //authContext = new AuthenticationContext(authority);
 
             //
             // Out of the box, this sample is *not* configured to work with Windows Integrated Authentication (WIA)
@@ -76,57 +80,57 @@ namespace TokenUniversalClient
 
         }
 
-        private async void button_Click(object sender, RoutedEventArgs e)
-        {
-            var result = await authContext.AcquireTokenAsync(sasTokenResourceId, clientId, redirectURI);
+        //private async void button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var result = await authContext.AcquireTokenAsync(sasTokenResourceId, clientId, redirectURI);
 
-            if (result.Status != AuthenticationStatus.Success)
-            {
-                if (result.Error == "authentication_canceled")
-                {
-                    // The user cancelled the sign-in, no need to display a message.
-                }
-                else
-                {
-                    MessageDialog dialog = new MessageDialog(string.Format("If the error continues, please contact your administrator.\n\nError: {0}\n\nError Description:\n\n{1}", result.Error, result.ErrorDescription), "Sorry, an error occurred while signing you in.");
-                    await dialog.ShowAsync();
-                }
-                return;
-            }
+        //    if (result.Status != AuthenticationStatus.Success)
+        //    {
+        //        if (result.Error == "authentication_canceled")
+        //        {
+        //            // The user cancelled the sign-in, no need to display a message.
+        //        }
+        //        else
+        //        {
+        //            MessageDialog dialog = new MessageDialog(string.Format("If the error continues, please contact your administrator.\n\nError: {0}\n\nError Description:\n\n{1}", result.Error, result.ErrorDescription), "Sorry, an error occurred while signing you in.");
+        //            await dialog.ShowAsync();
+        //        }
+        //        return;
+        //    }
 
-            var queryString = string.Format("serviceNamespace={0}&keyName={1}&eventHub={2}&publisherId={3}", serviceNamespace.Text, keyName.Text, eventHub.Text, publisherId.Text);
+        //    var queryString = string.Format("serviceNamespace={0}&keyName={1}&eventHub={2}&publisherId={3}", serviceNamespace.Text, keyName.Text, eventHub.Text, publisherId.Text);
 
-            //
-            // Add the access token to the Authorization Header of the call to the To Do list service, and call the service.
-            //
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+        //    //
+        //    // Add the access token to the Authorization Header of the call to the To Do list service, and call the service.
+        //    //
+        //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
-            var action = string.Format("/api/sastoken/{0}/{1}/{2}?publisherId={3}", serviceNamespace.Text, eventHub.Text, keyName.Text, publisherId.Text);
-            HttpResponseMessage response = await httpClient.GetAsync(sasTokenBaseAddress +  action);
+        //    var action = string.Format("/api/sastoken/{0}/{1}/{2}?publisherId={3}", serviceNamespace.Text, eventHub.Text, keyName.Text, publisherId.Text);
+        //    HttpResponseMessage response = await httpClient.GetAsync(sasTokenBaseAddress +  action);
 
-            if (response.IsSuccessStatusCode)
-            {
-                // Read the response as a Json Array and databind to the GridView to display todo items
-                var sasToken = await response.Content.ReadAsStringAsync();
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        // Read the response as a Json Array and databind to the GridView to display todo items
+        //        var sasToken = await response.Content.ReadAsStringAsync();
 
-                this.sasToken.Text = sasToken;
-            }
-            else
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    // If the To Do list service returns access denied, clear the token cache and have the user sign-in again.
-                    MessageDialog dialog = new MessageDialog("Sorry, you don't have access to the To Do Service.  Please sign-in again.");
-                    await dialog.ShowAsync();
-                    authContext.TokenCache.Clear();
-                }
-                else
-                {
-                    MessageDialog dialog = new MessageDialog("Sorry, an error occurred accessing your To Do list.  Please try again.");
-                    await dialog.ShowAsync();
-                }
-            }
-        }
+        //        this.sasToken.Text = sasToken;
+        //    }
+        //    else
+        //    {
+        //        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        //        {
+        //            // If the To Do list service returns access denied, clear the token cache and have the user sign-in again.
+        //            MessageDialog dialog = new MessageDialog("Sorry, you don't have access to the To Do Service.  Please sign-in again.");
+        //            await dialog.ShowAsync();
+        //            authContext.TokenCache.Clear();
+        //        }
+        //        else
+        //        {
+        //            MessageDialog dialog = new MessageDialog("Sorry, an error occurred accessing your To Do list.  Please try again.");
+        //            await dialog.ShowAsync();
+        //        }
+        //    }
+        //}
 
     }
 }
