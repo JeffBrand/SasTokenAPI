@@ -9,90 +9,94 @@
     mc:Ignorable="d"
     DataContext="{Binding Main, Source={StaticResource Locator}}">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <Grid x:Name="GridService">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*" />
-                <!--<RowDefinition Height="Auto"/>-->
-            </Grid.RowDefinitions>
-            <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Service Namespaces"/>
-            <ListView Grid.Row="1" x:Name="listView" ItemsSource="{Binding ServiceNamespaces}">
-                <Interactivity:Interaction.Behaviors>
-                    <Core:EventTriggerBehavior EventName="SelectionChanged">
-                        <Core:InvokeCommandAction Command="{Binding FetchEventHubs}" CommandParameter="{Binding SelectedItem, ElementName=listView, Mode=TwoWay}"/>
-                    </Core:EventTriggerBehavior>
-                </Interactivity:Interaction.Behaviors>
-            </ListView>
 
-        </Grid>
-        <Grid x:Name="GridEventHubs" Grid.Column="1">
+        <Grid  Margin="40,0,40,40" Grid.Row="1" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*" />
-                <!--<RowDefinition Height="Auto"/>-->
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <TextBlock TextWrapping="Wrap" Text="Event Hubs"/>
-            <ListView x:Name="listView1" Grid.Row="1" ItemsSource="{Binding EventHubs}">
-                <Interactivity:Interaction.Behaviors>
-                    <Core:EventTriggerBehavior EventName="SelectionChanged">
-                        <Core:InvokeCommandAction Command="{Binding FetchKeyNames}" CommandParameter="{Binding SelectedItem, ElementName=listView1, Mode=TwoWay}"/>
-                    </Core:EventTriggerBehavior>
-                </Interactivity:Interaction.Behaviors>
-            </ListView>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="GridService">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <!--<RowDefinition Height="Auto"/>-->
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Service Namespaces" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                <ListView Grid.Row="1" x:Name="listView" ItemsSource="{Binding ServiceNamespaces}">
+                    <Interactivity:Interaction.Behaviors>
+                        <Core:EventTriggerBehavior EventName="SelectionChanged">
+                            <Core:InvokeCommandAction Command="{Binding FetchEventHubs}" CommandParameter="{Binding SelectedItem, ElementName=listView, Mode=TwoWay}"/>
+                        </Core:EventTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                </ListView>
 
-        </Grid>
-        <Grid x:Name="GridKeyNames" Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*" />
-                <!--<RowDefinition Height="Auto"/>-->
-            </Grid.RowDefinitions>
-            <TextBlock  TextWrapping="Wrap" Text="Key Names"/>
-            <ListView Grid.Row="1" x:Name="listKeyNames" ItemsSource="{Binding KeyNames}">
-              
-            </ListView>
+            </Grid>
+            <Grid x:Name="GridEventHubs" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <!--<RowDefinition Height="Auto"/>-->
+                </Grid.RowDefinitions>
+                <TextBlock TextWrapping="Wrap" Text="Event Hubs" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                <ListView x:Name="listView1" Grid.Row="1" ItemsSource="{Binding EventHubs}">
+                    <Interactivity:Interaction.Behaviors>
+                        <Core:EventTriggerBehavior EventName="SelectionChanged">
+                            <Core:InvokeCommandAction Command="{Binding FetchKeyNames}" CommandParameter="{Binding SelectedItem, ElementName=listView1, Mode=TwoWay}"/>
+                        </Core:EventTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                </ListView>
 
-        </Grid>
-        <Grid HorizontalAlignment="Stretch"  Grid.Column="3">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <TextBlock Text="Key Informatoin"/>
-            <TextBlock Grid.Row="1" Text="Service Namespace"/>
-            <TextBox Grid.Row="2" Text="{Binding CurrentServiceNamespace, Mode=TwoWay}"/>
-            <TextBlock Grid.Row="3" Text="Event Hub"/>
-            <TextBox Grid.Row="4" Text="{Binding CurrentEventHub}"/>
-            <TextBlock Grid.Row="5" Text="Key Name"/>
-            <TextBox Grid.Row="6" Text="{Binding CurrentKeyName}"/>
-            <TextBlock Grid.Row="7" Text="Key Value"/>
-            <TextBox Grid.Row="8" Text="{Binding KeyValue}"/>
-            <StackPanel Grid.Row="9" Orientation="Horizontal"  HorizontalAlignment="Center">
-                <Button Content="Clear" Margin="0,0,20,0"/>
-                <Button Content="Save"/>
-            </StackPanel>
-        </Grid>
-        <!--#region Original UX-->
-        <!--<Grid.RowDefinitions>
+            </Grid>
+            <Grid x:Name="GridKeyNames" Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <!--<RowDefinition Height="Auto"/>-->
+                </Grid.RowDefinitions>
+                <TextBlock  TextWrapping="Wrap" Text="Key Names" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                <ListView Grid.Row="1" x:Name="listKeyNames" ItemsSource="{Binding KeyNames}"/>
+
+            </Grid>
+            <Grid HorizontalAlignment="Stretch"  Grid.Column="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Key Informatoin" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                <TextBlock Grid.Row="1" Text="Service Namespace"/>
+                <TextBox Grid.Row="2" Text="{Binding CurrentServiceNamespace, Mode=TwoWay}"/>
+                <TextBlock Grid.Row="3" Text="Event Hub"/>
+                <TextBox Grid.Row="4" Text="{Binding CurrentEventHub}"/>
+                <TextBlock Grid.Row="5" Text="Key Name"/>
+                <TextBox Grid.Row="6" Text="{Binding CurrentKeyName}"/>
+                <TextBlock Grid.Row="7" Text="Key Value"/>
+                <TextBox Grid.Row="8" Text="{Binding KeyValue}"/>
+                <StackPanel Grid.Row="9" Orientation="Horizontal"  HorizontalAlignment="Center">
+                    <Button Content="Clear" Margin="0,0,20,0"/>
+                    <Button Content="Save"/>
+                </StackPanel>
+            </Grid>
+            <!--#region Original UX-->
+            <!--<Grid.RowDefinitions>
             <RowDefinition Height="52*"/>
             <RowDefinition Height="139*"/>
             <RowDefinition Height="169*"/>
@@ -128,7 +132,9 @@
         </Grid>
         <TextBlock x:Name="textBlock5" HorizontalAlignment="Left" TextWrapping="Wrap" Text="SAS Token" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1"/>
         <TextBlock x:Name="sasToken" Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2" Text="abc" VerticalAlignment="Center" TextAlignment="Center" Style="{StaticResource SubheaderTextBlockStyle}"/>-->
-        <!--#endregion-->
+            <!--#endregion-->
 
+        </Grid>
+        <ProgressBar Height="10" VerticalAlignment="Bottom" IsIndeterminate="{Binding IsReading}" Background="{x:Null}"/>
     </Grid>
 </Page>
