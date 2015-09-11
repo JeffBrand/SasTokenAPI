@@ -10,6 +10,10 @@ namespace TokenUniversalClient.Converters
 {
     public class BooleanToVisibilityValueConverter : IValueConverter
     {
+        public BooleanToVisibilityValueConverter()
+        {
+
+        }
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;

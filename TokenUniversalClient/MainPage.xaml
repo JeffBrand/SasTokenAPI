@@ -7,7 +7,12 @@
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
     x:Class="TokenUniversalClient.MainPage"
     mc:Ignorable="d"
-    DataContext="{Binding Main, Source={StaticResource Locator}}">
+    DataContext="{Binding Main, Source={StaticResource Locator}}"
+    xmlns:converter="using:TokenUniversalClient.Converters"
+>
+    <Page.Resources>
+        <converter:BooleanToVisibilityValueConverter x:Key="BoolToVisibilityConverter"/>
+    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
@@ -17,7 +22,7 @@
 
         <Grid  Margin="40,0,40,40" Grid.Row="1" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -33,7 +38,7 @@
                     <!--<RowDefinition Height="Auto"/>-->
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Service Namespaces" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                <ListView Grid.Row="1" x:Name="listView" ItemsSource="{Binding ServiceNamespaces}">
+                <ListView Grid.Row="1" x:Name="listView" ItemsSource="{Binding ServiceNamespaces}" Margin="0,0,20,0">
                     <Interactivity:Interaction.Behaviors>
                         <Core:EventTriggerBehavior EventName="SelectionChanged">
                             <Core:InvokeCommandAction Command="{Binding FetchEventHubs}" CommandParameter="{Binding SelectedItem, ElementName=listView, Mode=TwoWay}"/>
@@ -49,7 +54,7 @@
                     <!--<RowDefinition Height="Auto"/>-->
                 </Grid.RowDefinitions>
                 <TextBlock TextWrapping="Wrap" Text="Event Hubs" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                <ListView x:Name="listView1" Grid.Row="1" ItemsSource="{Binding EventHubs}">
+                <ListView x:Name="listView1" Grid.Row="1" ItemsSource="{Binding EventHubs}" Margin="0,0,20,0">
                     <Interactivity:Interaction.Behaviors>
                         <Core:EventTriggerBehavior EventName="SelectionChanged">
                             <Core:InvokeCommandAction Command="{Binding FetchKeyNames}" CommandParameter="{Binding SelectedItem, ElementName=listView1, Mode=TwoWay}"/>
@@ -65,35 +70,48 @@
                     <!--<RowDefinition Height="Auto"/>-->
                 </Grid.RowDefinitions>
                 <TextBlock  TextWrapping="Wrap" Text="Key Names" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                <ListView Grid.Row="1" x:Name="listKeyNames" ItemsSource="{Binding KeyNames}"/>
+                <ListView Grid.Row="1" x:Name="listKeyNames" ItemsSource="{Binding KeyNames}" Margin="0,0,20,0">
+                    <Interactivity:Interaction.Behaviors>
+                        <Core:EventTriggerBehavior EventName="SelectionChanged">
+                            <Core:InvokeCommandAction Command="{Binding SelectKeyName}" CommandParameter="{Binding SelectedItem, ElementName=listKeyNames, Mode=TwoWay}"/>
+                        </Core:EventTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                </ListView>
 
             </Grid>
             <Grid HorizontalAlignment="Stretch"  Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="43*"/>
+                    <ColumnDefinition Width="7*"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="18*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="18*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="18*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="18*" />
+                    <RowDefinition Height="17*" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Key Informatoin" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                <TextBlock Grid.Row="1" Text="Service Namespace"/>
-                <TextBox Grid.Row="2" Text="{Binding CurrentServiceNamespace, Mode=TwoWay}"/>
-                <TextBlock Grid.Row="3" Text="Event Hub"/>
-                <TextBox Grid.Row="4" Text="{Binding CurrentEventHub}"/>
-                <TextBlock Grid.Row="5" Text="Key Name"/>
-                <TextBox Grid.Row="6" Text="{Binding CurrentKeyName}"/>
-                <TextBlock Grid.Row="7" Text="Key Value"/>
-                <TextBox Grid.Row="8" Text="{Binding KeyValue}"/>
+                <TextBlock Text="Key Information" Style="{StaticResource SubheaderTextBlockStyle}" Grid.ColumnSpan="2"/>
+                <TextBlock Grid.Row="1" Text="Service Namespace" Grid.ColumnSpan="2"/>
+                <TextBox Grid.Row="2" Text="{Binding CurrentServiceNamespace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" />
+                <TextBlock Grid.Row="3" Text="Event Hub" />
+                <TextBox Grid.Row="4" Text="{Binding CurrentEventHub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20"/>
+                <TextBlock Grid.Row="5" Text="Key Name" />
+                <TextBox Grid.Row="6" Text="{Binding CurrentKeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" />
+                <TextBlock Grid.Row="7" Text="Key Value" />
+                <TextBox Grid.Row="8" Text="{Binding KeyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20"  />
                 <StackPanel Grid.Row="9" Orientation="Horizontal"  HorizontalAlignment="Center">
-                    <Button Content="Clear" Margin="0,0,20,0"/>
-                    <Button Content="Save"/>
+                    <Button Content="Clear" Margin="0,0,20,0" Width="100"/>
+                    <Button Content="Save" Width="100"/>
                 </StackPanel>
+                <Image x:Name="image" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="2" Source="Assets/star.png" Visibility="{Binding IsNewServiceNamespace, Converter={StaticResource BoolToVisibilityConverter}}" Width="30" Height="30" ToolTipService.ToolTip="New Service Namespace"/>
+                <Image x:Name="image1" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="4" Source="Assets/star.png" Visibility="{Binding IsNewEventHub, Converter={StaticResource BoolToVisibilityConverter}}" Width="30" Height="30" ToolTipService.ToolTip="New Event Hub"/>
+                <Image x:Name="image2" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="6" Source="Assets/star.png" Visibility="{Binding IsNewKeyName, Converter={StaticResource BoolToVisibilityConverter}}" Width="30" Height="30" ToolTipService.ToolTip="New Key Name"/>
             </Grid>
             <!--#region Original UX-->
             <!--<Grid.RowDefinitions>
