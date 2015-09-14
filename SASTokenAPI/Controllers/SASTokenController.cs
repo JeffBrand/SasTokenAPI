@@ -17,7 +17,7 @@ using SASTokenAPI.Services;
 
 namespace SASTokenAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class SASTokenController : ApiController
     {
 
@@ -124,9 +124,18 @@ namespace SASTokenAPI.Controllers
             _ttl = TimeSpan.FromMinutes(DEFAULT_TTL);
         }
 
-
-        public void Post(string serviceName, string eventHub, string key)
+        [Route("api/sastoken")]
+        [HttpPost]
+        public async Task<IHttpActionResult> Post(string serviceName, string eventHub, string keyName, string keyValue)
         {
+            if (string.IsNullOrWhiteSpace(serviceName) ||
+                string.IsNullOrWhiteSpace(eventHub) ||
+                string.IsNullOrWhiteSpace(keyName) ||
+                string.IsNullOrWhiteSpace(keyValue))
+                return BadRequest("Cannot submit null or empty properties");
+
+            await _keyRepo.SaveKeyAsync(serviceName, eventHub, keyName, keyValue);
+            return Ok();
 
         }
     }

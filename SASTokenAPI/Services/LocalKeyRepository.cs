@@ -21,31 +21,35 @@ namespace SASTokenAPI.Services
             LoadKeys();
         }
 
-         async void LoadKeys()
+        void LoadKeys()
         {
             if (HttpContext.Current.Application["SasKeys"] != null)
+            {
                 _keys = HttpContext.Current.Application["SasKeys"] as Dictionary<string, KeyRegistration>;
+                return;
+            }
 
             var filePath = HttpContext.Current.Server.MapPath("~/sas.dat");
             if (File.Exists(filePath))
             {
                 var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 var reader = new StreamReader(file);
-                var json = await reader.ReadToEndAsync();
+                var json = reader.ReadToEnd();
+                file.Close();
+                file.Dispose();
 
                 try
                 {
-                    var keys = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                    HttpContext.Current.Application["SasKeys"] = keys;
-
+                    _keys = JsonConvert.DeserializeObject<Dictionary<string, KeyRegistration>>(json);
+                   
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     _keys = null;
                 }
             }
-
-            _keys = new Dictionary<string, KeyRegistration>() { { "testServiceNamespace:testEventHub:testSender",
+            else
+                _keys = new Dictionary<string, KeyRegistration>() { { "testServiceNamespace:testEventHub:testSender",
                                                                   new KeyRegistration()
                                                                   {
                                                                       ServiceNamespace = "testServiceNamespace",
@@ -55,6 +59,7 @@ namespace SASTokenAPI.Services
                                                                   }
                                                                  } };
 
+            HttpContext.Current.Application["SasKeys"] = _keys;
         }
 
         
@@ -101,7 +106,8 @@ namespace SASTokenAPI.Services
             else
                 _keys.Add(index, registration);
 
-            await SaveKeysAsync();
+            await WriteKeysToDisk();
+            HttpContext.Current.Application["SasKeys"] = _keys;
         }
 
 
@@ -111,7 +117,7 @@ namespace SASTokenAPI.Services
 
             var lookup = string.Format("{0}:{1}:{2}", serviceNamespace, eventHub, keyName);
             _keys.Remove(lookup);
-            await SaveKeysAsync();
+            await WriteKeysToDisk();
         }
 
         public async Task DeleteKeyAsync(KeyRegistration registration)
@@ -129,17 +135,26 @@ namespace SASTokenAPI.Services
             return await ContainsKeyAsync(registration.ServiceNamespace, registration.EventHub, registration.KeyName);
         }
 
-        private async Task SaveKeysAsync()
+        private async Task WriteKeysToDisk()
         {
             using (await _mutex.LockAsync())
             {
 
-                var json = JsonConvert.SerializeObject(_keys);
-                var file = new FileStream(HttpContext.Current.Server.MapPath("~/sas.dat"), FileMode.CreateNew, FileAccess.Write);
-                var writer = new StreamWriter(file);
-                await writer.WriteLineAsync(json);
-                await writer.FlushAsync();
-                file.Close();
+                try
+                {
+                    var json = JsonConvert.SerializeObject(_keys);
+                    var file = new FileStream(HttpContext.Current.Server.MapPath("~/sas.dat"), FileMode.Create, FileAccess.Write);
+                    var writer = new StreamWriter(file);
+                    await writer.WriteLineAsync(json);
+                    await writer.FlushAsync();
+                    file.Close();
+                    file.Dispose();
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
             }
         }
     }

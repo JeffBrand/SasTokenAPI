@@ -107,7 +107,7 @@
                 <TextBox Grid.Row="8" Text="{Binding KeyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20"  />
                 <StackPanel Grid.Row="9" Orientation="Horizontal"  HorizontalAlignment="Center">
                     <Button Content="Clear" Margin="0,0,20,0" Width="100"/>
-                    <Button Content="Save" Width="100"/>
+                    <Button Content="Save" Width="100" Command="{Binding SaveKey}"/>
                 </StackPanel>
                 <Image x:Name="image" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="2" Source="Assets/star.png" Visibility="{Binding IsNewServiceNamespace, Converter={StaticResource BoolToVisibilityConverter}}" Width="30" Height="30" ToolTipService.ToolTip="New Service Namespace"/>
                 <Image x:Name="image1" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="4" Source="Assets/star.png" Visibility="{Binding IsNewEventHub, Converter={StaticResource BoolToVisibilityConverter}}" Width="30" Height="30" ToolTipService.ToolTip="New Event Hub"/>
