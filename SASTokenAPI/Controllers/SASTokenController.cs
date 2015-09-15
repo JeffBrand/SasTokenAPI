@@ -17,7 +17,7 @@ using SASTokenAPI.Services;
 
 namespace SASTokenAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class SASTokenController : ApiController
     {
 
@@ -59,7 +59,7 @@ namespace SASTokenAPI.Controllers
         {
             
             var keys = await _keyRepo.GetRegistrationsAsync();
-            var eventhubs = (from k in keys where k.ServiceNamespace == serviceNamespace select k.EventHub);
+            var eventhubs = (from k in keys where k.ServiceNamespace == serviceNamespace select k.EventHub).Distinct();
             if (eventhubs != null && eventhubs.Count() > 0)
                 return Ok(eventhubs);
             else
@@ -126,15 +126,15 @@ namespace SASTokenAPI.Controllers
 
         [Route("api/sastoken")]
         [HttpPost]
-        public async Task<IHttpActionResult> Post(string serviceName, string eventHub, string keyName, string keyValue)
+        public async Task<IHttpActionResult> Post([FromBody] KeyRegistration keyRegistration)
         {
-            if (string.IsNullOrWhiteSpace(serviceName) ||
-                string.IsNullOrWhiteSpace(eventHub) ||
-                string.IsNullOrWhiteSpace(keyName) ||
-                string.IsNullOrWhiteSpace(keyValue))
+            if (string.IsNullOrWhiteSpace(keyRegistration.ServiceNamespace) ||
+                string.IsNullOrWhiteSpace(keyRegistration.EventHub) ||
+                string.IsNullOrWhiteSpace(keyRegistration.KeyName) ||
+                string.IsNullOrWhiteSpace(keyRegistration.KeyValue))
                 return BadRequest("Cannot submit null or empty properties");
 
-            await _keyRepo.SaveKeyAsync(serviceName, eventHub, keyName, keyValue);
+            await _keyRepo.SaveKeyAsync(keyRegistration.ServiceNamespace, keyRegistration.EventHub, keyRegistration.KeyName, keyRegistration.KeyValue);
             return Ok();
 
         }

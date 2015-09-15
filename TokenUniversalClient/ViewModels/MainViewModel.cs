@@ -187,12 +187,15 @@ namespace TokenUniversalClient.ViewModels
 
         }
 
-        private async Task PostAPICall(string content)
+        private async Task PostAPICall<T>(T data)
         {
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
-            var httpContent = new StringContent(content);
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var json = JsonConvert.SerializeObject(data);
 
-            var response = await httpClient.PostAsync("https://localhost:44300/api/sastoken?serviceName=test&eventHub=test&keyName=test&keyValue=test",null);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PostAsync(sasTokenBaseAddress, httpContent);
         }
         private async Task<T> GetAPICall<T>(string command)
         {
@@ -269,12 +272,14 @@ namespace TokenUniversalClient.ViewModels
             });
             this.SaveKey = new RelayCommand(async() =>
             {
-                var formContent = new FormUrlEncodedContent(new[]
-                  {
-                        new KeyValuePair<string,string>("serviceNamespace", "test")
-                  });
+                var keyRegistration = new {
+                    ServiceNamespace = this.CurrentServiceNamespace,
+                    EventHub = this.CurrentEventHub,
+                    KeyName = this.CurrentKeyName,
+                    KeyValue = this.CurrentKeyValue
+                };
 
-                await PostAPICall(await formContent.ReadAsStringAsync());
+                await PostAPICall<object>(keyRegistration);
             },
             () =>{
 
