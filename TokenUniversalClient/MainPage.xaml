@@ -22,8 +22,7 @@
 
         <Grid  Margin="40,0,40,40" Grid.Row="1" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="1*"/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
@@ -31,7 +30,7 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Grid x:Name="GridService">
+            <Grid x:Name="GridService" Margin="0,0,0,213">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*" />
@@ -47,7 +46,7 @@
                 </ListView>
 
             </Grid>
-            <Grid x:Name="GridEventHubs" Grid.Column="1">
+            <Grid x:Name="GridEventHubs" Grid.Column="1" Margin="0,0,0,213">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*" />
@@ -63,7 +62,7 @@
                 </ListView>
 
             </Grid>
-            <Grid x:Name="GridKeyNames" Grid.Column="2">
+            <Grid x:Name="GridKeyNames" Grid.Column="2" Margin="0,0,0,213">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*" />
@@ -79,7 +78,7 @@
                 </ListView>
 
             </Grid>
-            <Grid HorizontalAlignment="Stretch"  Grid.Column="3">
+            <Grid HorizontalAlignment="Stretch"  Grid.Column="3" Margin="0,0,0,213">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="43*"/>
                     <ColumnDefinition Width="7*"/>
@@ -98,13 +97,13 @@
                 </Grid.RowDefinitions>
                 <TextBlock Text="Key Information" Style="{StaticResource SubheaderTextBlockStyle}" Grid.ColumnSpan="2"/>
                 <TextBlock Grid.Row="1" Text="Service Namespace" Grid.ColumnSpan="2"/>
-                <TextBox Grid.Row="2" Text="{Binding CurrentServiceNamespace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" />
+                <TextBox Grid.Row="2" Text="{Binding CurrentServiceNamespace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" VerticalAlignment="Top" />
                 <TextBlock Grid.Row="3" Text="Event Hub" />
-                <TextBox Grid.Row="4" Text="{Binding CurrentEventHub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20"/>
+                <TextBox Grid.Row="4" Text="{Binding CurrentEventHub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" VerticalAlignment="Top"/>
                 <TextBlock Grid.Row="5" Text="Key Name" />
-                <TextBox Grid.Row="6" Text="{Binding CurrentKeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" />
+                <TextBox Grid.Row="6" Text="{Binding CurrentKeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" VerticalAlignment="Top" />
                 <TextBlock Grid.Row="7" Text="Key Value" />
-                <TextBox Grid.Row="8" Text="{Binding CurrentKeyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20"  />
+                <TextBox Grid.Row="8" Text="{Binding CurrentKeyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" VerticalAlignment="Top"  />
                 <StackPanel Grid.Row="9" Orientation="Horizontal"  HorizontalAlignment="Center">
                     <Button Content="Clear" Margin="0,0,20,0" Width="100"/>
                     <Button Content="Save" Width="100" Command="{Binding SaveKey}"/>
@@ -154,5 +153,12 @@
 
         </Grid>
         <ProgressBar Height="10" VerticalAlignment="Bottom" IsIndeterminate="{Binding IsReading}" Background="{x:Null}"/>
+        <Image x:Name="image3" HorizontalAlignment="Right" Grid.RowSpan="2" VerticalAlignment="Top" Source="Assets/sync.png" Width="32" Height="32" Margin="0,0,20,0" Grid.ColumnSpan="2" Grid.Row="1">
+            <Interactivity:Interaction.Behaviors>
+                <Core:EventTriggerBehavior EventName="PointerPressed">
+                    <Core:InvokeCommandAction Command="{Binding Refresh}"/>
+                </Core:EventTriggerBehavior>
+            </Interactivity:Interaction.Behaviors>
+        </Image>
     </Grid>
 </Page>

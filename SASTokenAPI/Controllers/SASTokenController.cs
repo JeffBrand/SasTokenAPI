@@ -17,7 +17,7 @@ using SASTokenAPI.Services;
 
 namespace SASTokenAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class SASTokenController : ApiController
     {
 

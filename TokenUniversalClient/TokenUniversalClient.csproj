@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\star.png" />
+    <Content Include="Assets\sync.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />

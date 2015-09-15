@@ -23,8 +23,8 @@ namespace TokenUniversalClient.ViewModels
         static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
 
         private static string sasTokenResourceId = "https://iotdevices.onmicrosoft.com/sastokenapi";
-        //private static string sasTokenBaseAddress = "https://mtcsastokenapi.azurewebsites.net/api/sastoken/";
-        private static string sasTokenBaseAddress = "https://localhost:44300/api/sastoken/";
+        private static string sasTokenBaseAddress = "https://mtcsastokenapi.azurewebsites.net/api/sastoken/";
+        //private static string sasTokenBaseAddress = "https://localhost:44300/api/sastoken/";
 
         private HttpClient httpClient = new HttpClient();
         private static AuthenticationContext authContext;
@@ -129,11 +129,13 @@ namespace TokenUniversalClient.ViewModels
 
         }
 
-        public RelayCommand<string> FetchEventHubs { get; set; }
-        public RelayCommand<string> FetchKeyNames { get; set; }
-        public RelayCommand<string> SelectKeyName { get; set; }
+        public RelayCommand<object> FetchEventHubs { get; set; }
+        public RelayCommand<object> FetchKeyNames { get; set; }
+        public RelayCommand<object> SelectKeyName { get; set; }
 
         public RelayCommand SaveKey { get; set; }
+
+        public RelayCommand Refresh { get; set; }
 
         public MainViewModel(IDialogService dialogService)
         {
@@ -170,22 +172,7 @@ namespace TokenUniversalClient.ViewModels
             await GetServiceNamespacesAsync();
         }
 
-        private async Task GetServiceNamespacesAsync()
-        {
-            this.ServiceNamespaces.Clear();
-
-            var serviceNamespaces = await GetAPICall<IEnumerable<string>>("servicenamespaces");
-            foreach (var s in serviceNamespaces)
-                this.ServiceNamespaces.Add(s);
-            CurrentServiceNamespace = string.Empty;
-
-            if (this.ServiceNamespaces.Count == 1)
-            {
-                await GetEventHubsAsync(this.ServiceNamespaces[0]);
-                CurrentServiceNamespace = this.ServiceNamespaces[0];
-            }
-
-        }
+     
 
         private async Task PostAPICall<T>(T data)
         {
@@ -196,6 +183,10 @@ namespace TokenUniversalClient.ViewModels
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await httpClient.PostAsync(sasTokenBaseAddress, httpContent);
+            if (response.IsSuccessStatusCode)
+                await GetServiceNamespacesAsync();
+            else
+                await _dialogService.ShowErrorAsync("Unable to update SAS Service", "Update Error");
         }
         private async Task<T> GetAPICall<T>(string command)
         {
@@ -223,12 +214,31 @@ namespace TokenUniversalClient.ViewModels
                 }
                 else
                 {
-                    await _dialogService.ShowErrorAsync("Sorry, an error occurred accessing your To Do list.  Please try again.", "Unexpected Error");
+                    await _dialogService.ShowErrorAsync("Sorry, an error occurred accessing the SAS Service.  Please try again.", "Unexpected Error");
                 }
                 IsReading = false;
                 return default(T);
             }
             
+        }
+
+        private async Task GetServiceNamespacesAsync()
+        {
+            ClearLists();
+
+            var serviceNamespaces = await GetAPICall<IEnumerable<string>>("servicenamespaces");
+            foreach (var s in serviceNamespaces)
+                this.ServiceNamespaces.Add(s);
+            CurrentServiceNamespace = string.Empty;
+
+
+        }
+
+        private void ClearLists()
+        {
+            this.ServiceNamespaces.Clear();
+            this.EventHubs.Clear();
+            this.KeyNames.Clear();
         }
 
         private async Task GetEventHubsAsync(string serviceNamespace)
@@ -259,15 +269,18 @@ namespace TokenUniversalClient.ViewModels
 
         private void SetupCommands()
         {
-            this.FetchEventHubs = new RelayCommand<string>(async (servicenamespace) => {
-                await GetEventHubsAsync(servicenamespace);
+            this.FetchEventHubs = new RelayCommand<object>(async (servicenamespace) => {
+                if (servicenamespace  is string)
+                    await GetEventHubsAsync(servicenamespace as string);
             });
-            this.FetchKeyNames = new RelayCommand<string>(async (eventhub) => {
-                await GetKeyNames(eventhub);
+            this.FetchKeyNames = new RelayCommand<object>(async (eventhub) => {
+                if (eventhub is string)
+                    await GetKeyNames(eventhub as string);
             });
-            this.SelectKeyName = new RelayCommand<string>((keyname) =>
+            this.SelectKeyName = new RelayCommand<object>((keyname) =>
             {
-                this.CurrentKeyName = keyname;
+                if (keyname is string)
+                    this.CurrentKeyName = keyname as string;
 
             });
             this.SaveKey = new RelayCommand(async() =>
@@ -285,6 +298,10 @@ namespace TokenUniversalClient.ViewModels
 
 
                 return true;
+            });
+            this.Refresh = new RelayCommand(async() =>
+            {
+                await GetServiceNamespacesAsync();
             });
         }
     }
