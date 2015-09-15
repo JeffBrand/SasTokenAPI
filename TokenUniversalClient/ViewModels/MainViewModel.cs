@@ -137,6 +137,8 @@ namespace TokenUniversalClient.ViewModels
 
         public RelayCommand Refresh { get; set; }
 
+        public RelayCommand Clear { get; set; }
+
         public MainViewModel(IDialogService dialogService)
         {
             _dialogService = dialogService;
@@ -302,6 +304,13 @@ namespace TokenUniversalClient.ViewModels
             this.Refresh = new RelayCommand(async() =>
             {
                 await GetServiceNamespacesAsync();
+            });
+            this.Clear = new RelayCommand(() =>
+            {
+                this.CurrentServiceNamespace = string.Empty;
+                this.CurrentEventHub= string.Empty;
+                this.CurrentKeyName = string.Empty;
+                this.CurrentKeyValue = string.Empty;
             });
         }
     }
