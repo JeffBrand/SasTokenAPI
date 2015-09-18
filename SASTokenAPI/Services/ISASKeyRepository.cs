@@ -6,18 +6,18 @@ namespace SASTokenAPI.Services
 {
     public interface ISASKeyRepository
     {
-        Task<IEnumerable<KeyRegistration>> GetRegistrationsAsync();
+        Task<IEnumerable<SASKeyRegistration>> GetRegistrationsAsync();
 
         Task<string> GetKeyAsync(string serviceNamespace, string eventHub, string keyName);
-        Task<string> GetKeyAsync(KeyRegistration registration);
+        Task<string> GetKeyAsync(SASKeyRegistration registration);
 
         Task SaveKeyAsync(string serviceNamespace, string eventHub, string keyName, string keyValue);
-        Task SaveKeyAsync(KeyRegistration keyRegistration);
+        Task SaveKeyAsync(SASKeyRegistration keyRegistration);
         Task DeleteKeyAsync(string serviceNamespace, string eventHub, string keyName);
-        Task DeleteKeyAsync(KeyRegistration keyRegistration);
+        Task DeleteKeyAsync(SASKeyRegistration keyRegistration);
 
         Task<bool> ContainsKeyAsync(string serviceNamespace, string eventHub, string keyName);
-        Task<bool> ContainsKeyAsync(KeyRegistration keyRegistration);
+        Task<bool> ContainsKeyAsync(SASKeyRegistration keyRegistration);
      
     }
 }

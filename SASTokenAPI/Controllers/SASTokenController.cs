@@ -14,10 +14,11 @@ using System.Threading.Tasks;
 using System.Web.Routing;
 using System.Security.Claims;
 using SASTokenAPI.Services;
+using SASTokenAPI.Filters;
 
 namespace SASTokenAPI.Controllers
 {
-    
+    [Authorize]
     public class SASTokenController : ApiController
     {
 
@@ -33,6 +34,7 @@ namespace SASTokenAPI.Controllers
            
         }
 
+        [HMACAuthentication]
         [Route("api/sastoken/test")]
         public IHttpActionResult GetTest()
         {
@@ -44,7 +46,6 @@ namespace SASTokenAPI.Controllers
         /// </summary>
         /// <returns></returns>
         /// 
-        [Authorize]
         [Route("api/sastoken/servicenamespaces")]
         public async Task<IHttpActionResult> GetRegisteredNamespaces()
         {
@@ -62,7 +63,6 @@ namespace SASTokenAPI.Controllers
         /// </summary>
         /// <param name="serviceNamespace"></param>
         /// <returns></returns>
-        [Authorize]
         [Route("api/sastoken/{serviceNamespace}/eventhubs")]
         public async Task<IHttpActionResult> GetEventHubsByNamespace(string serviceNamespace)
         {
@@ -75,7 +75,6 @@ namespace SASTokenAPI.Controllers
                 return NotFound();
         }
 
-        [Authorize]
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/keynames")]
         public async Task<IHttpActionResult> GetKeyNames(string serviceNamespace, string eventHub)
         {
@@ -88,7 +87,6 @@ namespace SASTokenAPI.Controllers
                 return NotFound();
         }
 
-        [Authorize]
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/{keyName}")]
         public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
         {
@@ -125,20 +123,11 @@ namespace SASTokenAPI.Controllers
 
 
      
-        private void LoadTTL()
-        {
-            var ttlSetting = ConfigurationManager.AppSettings["TokenTTL"];
-            int output = 0;
-            if (int.TryParse(ttlSetting, out output))
-                _ttl = TimeSpan.FromMinutes(output);
+      
 
-            _ttl = TimeSpan.FromMinutes(DEFAULT_TTL);
-        }
-
-        [Authorize]
         [Route("api/sastoken")]
         [HttpPost]
-        public async Task<IHttpActionResult> Post([FromBody] KeyRegistration keyRegistration)
+        public async Task<IHttpActionResult> Post([FromBody] SASKeyRegistration keyRegistration)
         {
             if (string.IsNullOrWhiteSpace(keyRegistration.ServiceNamespace) ||
                 string.IsNullOrWhiteSpace(keyRegistration.EventHub) ||
@@ -149,6 +138,16 @@ namespace SASTokenAPI.Controllers
             await _keyRepo.SaveKeyAsync(keyRegistration.ServiceNamespace, keyRegistration.EventHub, keyRegistration.KeyName, keyRegistration.KeyValue);
             return Ok();
 
+        }
+
+        private void LoadTTL()
+        {
+            var ttlSetting = ConfigurationManager.AppSettings["TokenTTL"];
+            int output = 0;
+            if (int.TryParse(ttlSetting, out output))
+                _ttl = TimeSpan.FromMinutes(output);
+
+            _ttl = TimeSpan.FromMinutes(DEFAULT_TTL);
         }
     }
 }

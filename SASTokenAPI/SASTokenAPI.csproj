@@ -97,6 +97,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -236,12 +237,16 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\SASTokenController.cs" />
     <Compile Include="Controllers\UnityResolver.cs" />
+    <Compile Include="Filters\HMACAuthenticationAttribute.cs" />
+    <Compile Include="Filters\ResultWithChallenge.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\KeyRegistration.cs" />
+    <Compile Include="Models\ApiKeyRegistration.cs" />
+    <Compile Include="Models\SASKeyRegistration.cs" />
     <Compile Include="Models\SASTokenRespone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IAPIKeyService.cs" />
     <Compile Include="Services\ISASKeyRepository.cs" />
     <Compile Include="Services\LocalSASKeyRepository.cs" />
     <Compile Include="Startup.cs" />

@@ -5,7 +5,7 @@ using System.Web;
 
 namespace SASTokenAPI.Models
 {
-    public class KeyRegistration
+    public class SASKeyRegistration
     {
         public string ServiceNamespace { get; set; }
         public string EventHub { get; set; }
