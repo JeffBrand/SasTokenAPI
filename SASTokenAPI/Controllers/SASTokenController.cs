@@ -77,7 +77,7 @@ namespace SASTokenAPI.Controllers
             else
                 return NotFound();
         }
-
+        
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/{keyName}")]
         public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
         {
