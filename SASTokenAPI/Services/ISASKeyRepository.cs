@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SASTokenAPI.Services
 {
-    public interface IKeyRepository
+    public interface ISASKeyRepository
     {
         Task<IEnumerable<KeyRegistration>> GetRegistrationsAsync();
 

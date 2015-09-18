@@ -10,13 +10,13 @@ using System.Web;
 
 namespace SASTokenAPI.Services
 {
-    public class LocalKeyRepository : IKeyRepository
+    public class LocalSASKeyRepository : ISASKeyRepository
     {
         Dictionary<string, KeyRegistration> _keys;
 
         private readonly AsyncLock _mutex = new AsyncLock();
 
-        public LocalKeyRepository()
+        public LocalSASKeyRepository()
         {
             LoadKeys();
         }

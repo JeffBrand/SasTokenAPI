@@ -17,26 +17,34 @@ using SASTokenAPI.Services;
 
 namespace SASTokenAPI.Controllers
 {
-    [Authorize]
+    
     public class SASTokenController : ApiController
     {
 
         const int DEFAULT_TTL = 120;
 
         TimeSpan _ttl;
-        IKeyRepository _keyRepo;
+        ISASKeyRepository _keyRepo;
 
-        public SASTokenController(IKeyRepository keyRepo)
+        public SASTokenController(ISASKeyRepository keyRepo)
         {
             _keyRepo = keyRepo;
             LoadTTL();
            
         }
 
+        [Route("api/sastoken/test")]
+        public IHttpActionResult GetTest()
+        {
+            return Ok();
+        }
+
         /// <summary>
         ///  Return list of registered service namespaces
         /// </summary>
         /// <returns></returns>
+        /// 
+        [Authorize]
         [Route("api/sastoken/servicenamespaces")]
         public async Task<IHttpActionResult> GetRegisteredNamespaces()
         {
@@ -54,6 +62,7 @@ namespace SASTokenAPI.Controllers
         /// </summary>
         /// <param name="serviceNamespace"></param>
         /// <returns></returns>
+        [Authorize]
         [Route("api/sastoken/{serviceNamespace}/eventhubs")]
         public async Task<IHttpActionResult> GetEventHubsByNamespace(string serviceNamespace)
         {
@@ -66,6 +75,7 @@ namespace SASTokenAPI.Controllers
                 return NotFound();
         }
 
+        [Authorize]
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/keynames")]
         public async Task<IHttpActionResult> GetKeyNames(string serviceNamespace, string eventHub)
         {
@@ -78,6 +88,7 @@ namespace SASTokenAPI.Controllers
                 return NotFound();
         }
 
+        [Authorize]
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/{keyName}")]
         public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
         {
@@ -124,6 +135,7 @@ namespace SASTokenAPI.Controllers
             _ttl = TimeSpan.FromMinutes(DEFAULT_TTL);
         }
 
+        [Authorize]
         [Route("api/sastoken")]
         [HttpPost]
         public async Task<IHttpActionResult> Post([FromBody] KeyRegistration keyRegistration)

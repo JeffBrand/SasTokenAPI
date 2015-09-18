@@ -242,8 +242,8 @@
     <Compile Include="Models\KeyRegistration.cs" />
     <Compile Include="Models\SASTokenRespone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IKeyRepository.cs" />
-    <Compile Include="Services\LocalKeyRepository.cs" />
+    <Compile Include="Services\ISASKeyRepository.cs" />
+    <Compile Include="Services\LocalSASKeyRepository.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
