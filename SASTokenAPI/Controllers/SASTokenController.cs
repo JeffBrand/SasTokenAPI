@@ -34,7 +34,7 @@ namespace SASTokenAPI.Controllers
            
         }
 
-        [HMACAuthentication]
+
         [Route("api/sastoken/test")]
         public IHttpActionResult GetTest()
         {
@@ -46,6 +46,7 @@ namespace SASTokenAPI.Controllers
         /// </summary>
         /// <returns></returns>
         /// 
+
         [Route("api/sastoken/servicenamespaces")]
         public async Task<IHttpActionResult> GetRegisteredNamespaces()
         {
@@ -87,6 +88,8 @@ namespace SASTokenAPI.Controllers
                 return NotFound();
         }
 
+    
+  
         [Route("api/sastoken/{serviceNamespace}/{eventHub}/{keyName}")]
         public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
         {
@@ -122,8 +125,6 @@ namespace SASTokenAPI.Controllers
         }
 
 
-     
-      
 
         [Route("api/sastoken")]
         [HttpPost]

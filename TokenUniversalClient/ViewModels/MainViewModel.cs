@@ -23,6 +23,7 @@ namespace TokenUniversalClient.ViewModels
         static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
 
         private static string sasTokenResourceId = "https://iotdevices.onmicrosoft.com/sastokenapi";
+        //private static string sasTokenBaseAddress = "https://mtcsastokenapi-test.azurewebsites.net/api/sastoken/";
         private static string sasTokenBaseAddress = "https://mtcsastokenapi.azurewebsites.net/api/sastoken/";
         //private static string sasTokenBaseAddress = "https://localhost:44300/api/sastoken/";
 
@@ -211,7 +212,7 @@ namespace TokenUniversalClient.ViewModels
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     // If the To Do list service returns access denied, clear the token cache and have the user sign-in again.
-                    await _dialogService.ShowErrorAsync("Sorry, you don't have access to the To Do Service.  Please sign-in again.", "Not Authorized");
+                    await _dialogService.ShowErrorAsync("Sorry, you don't have access to the SAS Service.  Please sign-in again.", "Not Authorized");
                     authContext.TokenCache.Clear();
                 }
                 else
@@ -229,6 +230,9 @@ namespace TokenUniversalClient.ViewModels
             ClearLists();
 
             var serviceNamespaces = await GetAPICall<IEnumerable<string>>("servicenamespaces");
+            if (serviceNamespaces == null)
+                return;
+
             foreach (var s in serviceNamespaces)
                 this.ServiceNamespaces.Add(s);
             CurrentServiceNamespace = string.Empty;
@@ -247,6 +251,10 @@ namespace TokenUniversalClient.ViewModels
         {
             this.EventHubs.Clear();
             var hubs = await GetAPICall<IEnumerable<string>>(serviceNamespace + "/eventhubs");
+
+            if (hubs == null)
+                return;
+
             foreach (var h in hubs)
             {
                 EventHubs.Add(h);
@@ -260,6 +268,9 @@ namespace TokenUniversalClient.ViewModels
         {
             this.KeyNames.Clear();
             var keys = await GetAPICall<IEnumerable<string>>(CurrentServiceNamespace + "/" + eventhub + "/" + "keynames");
+            if (keys == null)
+                return;
+
             foreach (var k in keys)
             {
                 this.KeyNames.Add(k);
