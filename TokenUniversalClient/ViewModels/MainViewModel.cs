@@ -23,9 +23,8 @@ namespace TokenUniversalClient.ViewModels
         static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
 
         private static string sasTokenResourceId = "https://iotdevices.onmicrosoft.com/sastokenapi";
-        //private static string sasTokenBaseAddress = "https://mtcsastokenapi-test.azurewebsites.net/api/sastoken/";
-        private static string sasTokenBaseAddress = "https://mtcsastokenapi.azurewebsites.net/api/sastoken/";
-        //private static string sasTokenBaseAddress = "https://localhost:44300/api/sastoken/";
+        private static string sasTokenBaseAddress = "https://mtcsastokenapi.azurewebsites.net/api/v1/";
+        //private static string sasTokenBaseAddress = "https://localhost:44300/api/v1/";
 
         private HttpClient httpClient = new HttpClient();
         private static AuthenticationContext authContext;
@@ -229,7 +228,7 @@ namespace TokenUniversalClient.ViewModels
         {
             ClearLists();
 
-            var serviceNamespaces = await GetAPICall<IEnumerable<string>>("servicenamespaces");
+            var serviceNamespaces = await GetAPICall<IEnumerable<string>>("sasKeys/servicenamespaces");
             if (serviceNamespaces == null)
                 return;
 
@@ -250,7 +249,7 @@ namespace TokenUniversalClient.ViewModels
         private async Task GetEventHubsAsync(string serviceNamespace)
         {
             this.EventHubs.Clear();
-            var hubs = await GetAPICall<IEnumerable<string>>(serviceNamespace + "/eventhubs");
+            var hubs = await GetAPICall<IEnumerable<string>>("saskeys/" + serviceNamespace + "/eventhubs");
 
             if (hubs == null)
                 return;
@@ -267,7 +266,7 @@ namespace TokenUniversalClient.ViewModels
         private async Task GetKeyNames(string eventhub)
         {
             this.KeyNames.Clear();
-            var keys = await GetAPICall<IEnumerable<string>>(CurrentServiceNamespace + "/" + eventhub + "/" + "keynames");
+            var keys = await GetAPICall<IEnumerable<string>>("saskeys/" + CurrentServiceNamespace + "/" + eventhub + "/" + "keynames");
             if (keys == null)
                 return;
 
@@ -316,13 +315,12 @@ namespace TokenUniversalClient.ViewModels
             {
                 await GetServiceNamespacesAsync();
             });
-            this.Clear = new RelayCommand(async() =>
+            this.Clear = new RelayCommand(() =>
             {
                 this.CurrentServiceNamespace = string.Empty;
                 this.CurrentEventHub= string.Empty;
                 this.CurrentKeyName = string.Empty;
                 this.CurrentKeyValue = string.Empty;
-                var x = await GetAPICall<string>("testServiceNamespace/testEventHub/testSender?publisherId=s");
 
             });
         }
