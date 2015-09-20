@@ -137,7 +137,7 @@ namespace TokenClient
 
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
-            HttpResponseMessage response = httpClient.GetAsync(sasTokenBaseAddress + "/api/sastoken?serviceNamespace=jbrandhackathon&keyName=Sender&eventhub=hackhub&publisherId=console").Result;
+            HttpResponseMessage response = httpClient.GetAsync(sasTokenBaseAddress + "/api/v1/sastoken/{serviceNamespace}/{eventHub}/{keyName}/{publisherId}").Result;
 
             if (response.IsSuccessStatusCode)
             {

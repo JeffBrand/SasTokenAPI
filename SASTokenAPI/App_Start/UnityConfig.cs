@@ -37,7 +37,7 @@ namespace SASTokenAPI.App_Start
             // container.LoadConfiguration();
 
             // TODO: Register your types here
-            container.RegisterType<IKeyRepository, LocalKeyRepository>();
+            container.RegisterType<ISASKeyRepository, LocalSASKeyRepository>();
         }
     }
 }
