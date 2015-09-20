@@ -137,7 +137,7 @@ namespace TokenClient
 
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
-            HttpResponseMessage response = httpClient.GetAsync(sasTokenBaseAddress + "/api/v1/sastoken/{serviceNamespace}/{eventHub}/{keyName}/{publisherId}").Result;
+            HttpResponseMessage response = httpClient.GetAsync(sasTokenBaseAddress + "/api/v1/sastoken/testServiceNamespace/testEventHub/testSender/ConsoleClient").Result;
 
             if (response.IsSuccessStatusCode)
             {
