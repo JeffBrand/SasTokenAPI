@@ -16,8 +16,7 @@ namespace SASTokenAPI.Services
         Task DeleteKeyAsync(string serviceNamespace, string eventHub, string keyName);
         Task DeleteKeyAsync(SASKeyRegistration keyRegistration);
 
-        Task<bool> ContainsKeyAsync(string serviceNamespace, string eventHub, string keyName);
-        Task<bool> ContainsKeyAsync(SASKeyRegistration keyRegistration);
+      
      
     }
 }

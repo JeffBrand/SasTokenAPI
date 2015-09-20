@@ -5,7 +5,7 @@ using System.Web;
 
 namespace SASTokenAPI.Models
 {
-    public class SASTokenRespone
+    public class SASTokenResponse
     {
         public string Token { get; set; }
         public TimeSpan TTL { get; set; }

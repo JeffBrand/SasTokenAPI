@@ -70,7 +70,7 @@ namespace SASTokenAPI.Services
 
 
         public async Task<string> GetKeyAsync(string serviceNamespace, string eventHub, string keyName) {
-            if (!(await ContainsKeyAsync(serviceNamespace, eventHub, keyName)))
+            if (!(ContainsKeyAsync(serviceNamespace, eventHub, keyName)))
                 return null;
 
             var lookup = string.Format("{0}:{1}:{2}", serviceNamespace, eventHub, keyName);
@@ -112,7 +112,7 @@ namespace SASTokenAPI.Services
 
 
         public async Task DeleteKeyAsync(string serviceNamespace, string eventHub, string keyName) {
-            if (!(await ContainsKeyAsync(serviceNamespace, eventHub, keyName)))
+            if (!(ContainsKeyAsync(serviceNamespace, eventHub, keyName)))
                 return;
 
             var lookup = string.Format("{0}:{1}:{2}", serviceNamespace, eventHub, keyName);
@@ -125,14 +125,14 @@ namespace SASTokenAPI.Services
             await DeleteKeyAsync(registration.ServiceNamespace, registration.EventHub, registration.KeyName);
         }
 
-        public async Task<bool> ContainsKeyAsync(string serviceNamespace, string eventHub, string keyName) {
+        private bool ContainsKeyAsync(string serviceNamespace, string eventHub, string keyName) {
             var lookup = string.Format("{0}:{1}:{2}", serviceNamespace, eventHub, keyName);
             return (from k in _keys.Keys where k == lookup select k).Any();
         }
 
-        public async Task<bool>  ContainsKeyAsync(SASKeyRegistration registration)
+        private bool ContainsKeyAsync(SASKeyRegistration registration)
         {
-            return await ContainsKeyAsync(registration.ServiceNamespace, registration.EventHub, registration.KeyName);
+            return ContainsKeyAsync(registration.ServiceNamespace, registration.EventHub, registration.KeyName);
         }
 
         private async Task WriteKeysToDisk()

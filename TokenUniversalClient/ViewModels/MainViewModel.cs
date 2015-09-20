@@ -316,12 +316,14 @@ namespace TokenUniversalClient.ViewModels
             {
                 await GetServiceNamespacesAsync();
             });
-            this.Clear = new RelayCommand(() =>
+            this.Clear = new RelayCommand(async() =>
             {
                 this.CurrentServiceNamespace = string.Empty;
                 this.CurrentEventHub= string.Empty;
                 this.CurrentKeyName = string.Empty;
                 this.CurrentKeyValue = string.Empty;
+                var x = await GetAPICall<string>("testServiceNamespace/testEventHub/testSender?publisherId=s");
+
             });
         }
     }
