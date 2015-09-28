@@ -100,44 +100,48 @@ namespace TokenClient
             return password;
         }
 
-        static void GetToken()
+        static async void GetToken()
         {
             #region Obtain token
-            AuthenticationResult result = null;
-            // first, try to get a token silently
-            try
-            {
-                result = authContext.AcquireTokenSilent(sasTokenResourceId, clientId);
-            }
-            catch (AdalException ex)
-            {
-                // There is no token in the cache; prompt the user to sign-in.
-                if (ex.ErrorCode == "failed_to_acquire_token_silently")
-                {
-                    UserCredential uc = TextualPrompt();
-                    // if you want to use Windows integrated auth, comment the line above and uncomment the one below
-                    // UserCredential uc = new UserCredential();
-                    try
-                    {
-                        result = authContext.AcquireToken(sasTokenResourceId, clientId, uc);
-                    }
-                    catch (Exception ee)
-                    {
-                        ShowError(ee);
-                        return;
-                    }
-                }
-                else
-                {
-                    // An unexpected error occurred.
-                    ShowError(ex);
-                    return;
-                }
-            }
+            //AuthenticationResult result = null;
+            //// first, try to get a token silently
+            //try
+            //{
+            //    result = authContext.AcquireTokenSilent(sasTokenResourceId, clientId);
+            //}
+            //catch (AdalException ex)
+            //{
+            //    // There is no token in the cache; prompt the user to sign-in.
+            //    if (ex.ErrorCode == "failed_to_acquire_token_silently")
+            //    {
+            //        UserCredential uc = TextualPrompt();
+            //        // if you want to use Windows integrated auth, comment the line above and uncomment the one below
+            //        // UserCredential uc = new UserCredential();
+            //        try
+            //        {
+            //            result = authContext.AcquireToken(sasTokenResourceId, clientId, uc);
+            //        }
+            //        catch (Exception ee)
+            //        {
+            //            ShowError(ee);
+            //            return;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // An unexpected error occurred.
+            //        ShowError(ex);
+            //        return;
+            //    }
+            //}
 
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
-            HttpResponseMessage response = httpClient.GetAsync(sasTokenBaseAddress + "/api/v1/sastoken/{serviceNamespace}/{eventHub}/{keyName}/{publisherId}").Result;
+            //HttpClient httpClient = new HttpClient();
+            //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+            //HttpResponseMessage response = httpClient.GetAsync(sasTokenBaseAddress + "/api/v1/sastoken/{serviceNamespace}/{eventHub}/{keyName}/{publisherId}").Result;
+
+            var handler = new CustomDelegatingHandler();
+            var httpClient = new HttpClient(handler);
+            var response = await httpClient.GetAsync(sasTokenBaseAddress + "testServiceNamespace/testEventHub/testSender/ConsoleClient");
 
             if (response.IsSuccessStatusCode)
             {
