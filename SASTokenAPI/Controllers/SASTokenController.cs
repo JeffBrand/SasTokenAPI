@@ -14,7 +14,7 @@ using System.Web.Http;
 namespace SASTokenAPI.Controllers
 {
     [RoutePrefix("api/v1/sastoken")]
-    [Authorize]
+    [HMACAuthentication]
     public class SasTokenController : ApiController
     {
         const int DEFAULT_TTL = 120;
