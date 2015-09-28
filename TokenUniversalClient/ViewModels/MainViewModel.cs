@@ -184,7 +184,7 @@ namespace TokenUniversalClient.ViewModels
 
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync(sasTokenBaseAddress, httpContent);
+            var response = await httpClient.PostAsync(sasTokenBaseAddress + "sasKeys", httpContent);
             if (response.IsSuccessStatusCode)
                 await GetServiceNamespacesAsync();
             else
