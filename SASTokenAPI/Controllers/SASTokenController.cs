@@ -14,7 +14,7 @@ using System.Web.Http;
 namespace SASTokenAPI.Controllers
 {
     [RoutePrefix("api/v1/sastoken")]
-    [HMACAuthentication]
+    //[HMACAuthentication]
     public class SasTokenController : ApiController
     {
         const int DEFAULT_TTL = 120;
@@ -36,7 +36,7 @@ namespace SASTokenAPI.Controllers
             var key = await _keyRepo.GetKeyAsync(serviceNamespace, eventHub, keyName);
             if (key != null)
             {
-                Uri serviceUri;
+                string serviceUri;
                 string sasToken;
 
                 
@@ -44,14 +44,13 @@ namespace SASTokenAPI.Controllers
                 {
                     case "HTTP":
                     case "HTTPS":
-                        serviceUri = ServiceBusEnvironment.CreateServiceUri("https", serviceNamespace, String.Format("{0}/publishers/{1}/messages", eventHub, publisherId));
-                                        
+                        serviceUri = ServiceBusEnvironment.CreateServiceUri("https", serviceNamespace, String.Format("{0}/publishers/{1}/messages", eventHub, publisherId)).ToString().Trim('/');
 
-                        sasToken = SharedAccessSignatureTokenProvider.GetPublisherSharedAccessSignature(serviceUri, eventHub, publisherId,keyName, key, _ttl);
+                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, key, serviceUri, _ttl);
                         return Ok(new SASTokenResponse() { Token = sasToken, TTL = _ttl });
                     case "AMQP":
-                        serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", serviceNamespace, String.Format("{0}/publishers/{1}", eventHub, publisherId));
-                        sasToken = SharedAccessSignatureTokenProvider.GetPublisherSharedAccessSignature(serviceUri, eventHub, publisherId, keyName, key, _ttl);
+                        serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", serviceNamespace, String.Format("{0}/publishers/{1}/messages", eventHub, publisherId)).ToString().Trim('/');
+                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, key, serviceUri, _ttl);
                         return Ok(new SASTokenResponse { Token = sasToken, TTL = _ttl });
                     default:
                         return BadRequest("Invalid transport type");

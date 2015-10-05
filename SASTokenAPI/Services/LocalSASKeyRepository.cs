@@ -57,7 +57,16 @@ namespace SASTokenAPI.Services
                                                                       KeyName = "testSender",
                                                                       KeyValue = "testkeyvalue"
                                                                   }
-                                                                 } };
+                                                                 },
+                                                                { "dev-com-thetoroco-device:iot-proto:Sender",
+                                                                  new SASKeyRegistration()
+                                                                  {
+                                                                      ServiceNamespace = "dev-com-thetoroco-device",
+                                                                      EventHub = "iot-proto",
+                                                                      KeyName = "Sender",
+                                                                      KeyValue = "TeUo2BzmPbr86ixA50EE9KXgaenLYiEQAu2rBgTEX84="
+                                                                  }
+                                                                 }          };
 
             HttpContext.Current.Application["SasKeys"] = _keys;
         }
@@ -74,7 +83,8 @@ namespace SASTokenAPI.Services
                 return null;
 
             var lookup = string.Format("{0}:{1}:{2}", serviceNamespace, eventHub, keyName);
-            return (from k in _keys.Keys where k == lookup select k).First();
+            var key = (from k in _keys.Keys where k == lookup select k).First();
+            return _keys[key].KeyValue;
 
         }
 
