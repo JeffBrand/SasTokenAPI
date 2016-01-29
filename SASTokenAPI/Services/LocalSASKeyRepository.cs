@@ -58,13 +58,13 @@ namespace SASTokenAPI.Services
                                                                       KeyValue = "testkeyvalue"
                                                                   }
                                                                  },
-                                                                { "dev-com-thetoroco-device:iot-proto:Sender",
+                                                                { "iot-mspmtc:telemetry:Sender",
                                                                   new SASKeyRegistration()
                                                                   {
-                                                                      ServiceNamespace = "dev-com-thetoroco-device",
-                                                                      EventHub = "iot-proto",
+                                                                      ServiceNamespace = "iot-mspmtc",
+                                                                      EventHub = "telemetry",
                                                                       KeyName = "Sender",
-                                                                      KeyValue = "TeUo2BzmPbr86ixA50EE9KXgaenLYiEQAu2rBgTEX84="
+                                                                      KeyValue = "p0Yv+1eoLwjPgmIArIdO5evGAPl06ZQY+zvtpfbYlRg="
                                                                   }
                                                                  }          };
 
