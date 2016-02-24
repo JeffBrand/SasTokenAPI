@@ -18,22 +18,21 @@ using SASTokenAPI.Filters;
 
 namespace SASTokenAPI.Controllers
 {
-    [Authorize]
     [RoutePrefix("api/v1/saskeys")]
     public class SasKeysController : ApiController
     {
 
- 
+
         ISASKeyRepository _keyRepo;
 
         public SasKeysController(ISASKeyRepository keyRepo)
         {
             _keyRepo = keyRepo;
-           
+
         }
 
 
-            /// <summary>
+        /// <summary>
         ///  Return list of registered service namespaces
         /// </summary>
         /// <returns></returns>
@@ -59,7 +58,7 @@ namespace SASTokenAPI.Controllers
         [Route("{serviceNamespace}/eventhubs")]
         public async Task<IHttpActionResult> GetEventHubsByNamespace(string serviceNamespace)
         {
-            
+
             var keys = await _keyRepo.GetRegistrationsAsync();
             var eventhubs = (from k in keys where k.ServiceNamespace == serviceNamespace select k.EventHub).Distinct();
             if (eventhubs != null && eventhubs.Count() > 0)
@@ -80,8 +79,8 @@ namespace SASTokenAPI.Controllers
                 return NotFound();
         }
 
-    
-     
+
+
 
         [Route("")]
         [HttpPost]
@@ -94,11 +93,16 @@ namespace SASTokenAPI.Controllers
                 return BadRequest("Cannot submit null or empty properties");
 
             await _keyRepo.SaveKeyAsync(keyRegistration.ServiceNamespace, keyRegistration.EventHub, keyRegistration.KeyName, keyRegistration.KeyValue);
-            return Ok();
+            return Created<SASKeyRegistration>("", keyRegistration);
 
         }
 
-     
+        [Route("{serviceNamespace}/{eventHub}/{keyname}")]
+        public async Task<IHttpActionResult> Delete(string serviceNamespace, string eventHub, string keyname)
+        {
+            await _keyRepo.DeleteKeyAsync(serviceNamespace, eventHub, keyname);
+            return Ok();
+        }
     }
 }
 
