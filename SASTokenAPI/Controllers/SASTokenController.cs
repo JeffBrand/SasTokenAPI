@@ -17,9 +17,9 @@ namespace SASTokenAPI.Controllers
     //[HMACAuthentication]
     public class SasTokenController : ApiController
     {
-        const int DEFAULT_TTL = 120;
+        const int DEFAULT_TTL_MINUTES = 120;
 
-        TimeSpan _ttl;
+        TimeSpan _ttlFromConfig;
         private ISASKeyRepository _keyRepo;
 
         public SasTokenController(ISASKeyRepository keyRepo)
@@ -31,7 +31,7 @@ namespace SASTokenAPI.Controllers
         
    
         [Route("{serviceNamespace}/{eventHub}/{keyName}/{publisherId}")]
-        public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http")
+        public async Task<IHttpActionResult> GetToken(string serviceNamespace, string eventHub, string keyName, string publisherId, string transport = "http", int ttlMinutes = -1)
         {
             var key = await _keyRepo.GetKeyAsync(serviceNamespace, eventHub, keyName);
             if (key != null)
@@ -39,6 +39,11 @@ namespace SASTokenAPI.Controllers
                 string serviceUri;
                 string sasToken;
 
+                TimeSpan ttl;
+                if (ttlMinutes < 0)
+                    ttl = _ttlFromConfig;
+                else
+                    ttl = TimeSpan.FromMinutes(ttlMinutes);
                 
                 switch (transport.ToUpper())
                 {
@@ -46,12 +51,12 @@ namespace SASTokenAPI.Controllers
                     case "HTTPS":
                         serviceUri = ServiceBusEnvironment.CreateServiceUri("https", serviceNamespace, String.Format("{0}/publishers/{1}/messages", eventHub, publisherId)).ToString().Trim('/');
 
-                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, key, serviceUri, _ttl);
-                        return Ok(new SASTokenResponse() { Token = sasToken, TTL = _ttl });
+                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, key, serviceUri, ttl);
+                        return Ok(new SASTokenResponse() { Token = sasToken, TTL = ttl });
                     case "AMQP":
                         serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", serviceNamespace, String.Format("{0}/publishers/{1}/messages", eventHub, publisherId)).ToString().Trim('/');
-                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, key, serviceUri, _ttl);
-                        return Ok(new SASTokenResponse { Token = sasToken, TTL = _ttl });
+                        sasToken = SharedAccessSignatureTokenProvider.GetSharedAccessSignature(keyName, key, serviceUri, ttl);
+                        return Ok(new SASTokenResponse { Token = sasToken, TTL = ttl });
                     default:
                         return BadRequest("Invalid transport type");
                 }
@@ -65,9 +70,9 @@ namespace SASTokenAPI.Controllers
             var ttlSetting = ConfigurationManager.AppSettings["TokenTTL"];
             int output = 0;
             if (int.TryParse(ttlSetting, out output))
-                _ttl = TimeSpan.FromMinutes(output);
+                _ttlFromConfig = TimeSpan.FromMinutes(output);
 
-            _ttl = TimeSpan.FromMinutes(DEFAULT_TTL);
+            _ttlFromConfig = TimeSpan.FromMinutes(DEFAULT_TTL_MINUTES);
         }
 
     }

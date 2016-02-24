@@ -57,16 +57,7 @@ namespace SASTokenAPI.Services
                                                                       KeyName = "testSender",
                                                                       KeyValue = "testkeyvalue"
                                                                   }
-                                                                 },
-                                                                { "iot-mspmtc:telemetry:Sender",
-                                                                  new SASKeyRegistration()
-                                                                  {
-                                                                      ServiceNamespace = "iot-mspmtc",
-                                                                      EventHub = "telemetry",
-                                                                      KeyName = "Sender",
-                                                                      KeyValue = "p0Yv+1eoLwjPgmIArIdO5evGAPl06ZQY+zvtpfbYlRg="
-                                                                  }
-                                                                 }          };
+                                                                 }      };
 
             HttpContext.Current.Application["SasKeys"] = _keys;
         }
